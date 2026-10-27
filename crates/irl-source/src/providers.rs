@@ -150,7 +150,14 @@ fn wake_dialogs() {
 }
 
 pub fn defaults(settings: &Data<'_>) {
-    settings.set_default_str(KEY_PROVIDER, c"");
+    // A new source starts on the first listed provider (Kastry in the stock
+    // list) rather than on Manual URL.
+    let first = catalog()
+        .providers()
+        .first()
+        .map(|p| cstring(&p.base_url))
+        .unwrap_or_default();
+    settings.set_default_str(KEY_PROVIDER, &first);
     settings.set_default_str(KEY_PROVIDER_URL, c"");
 }
 

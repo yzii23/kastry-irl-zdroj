@@ -22,13 +22,13 @@ pub mod shared;
 pub mod source;
 
 obs::declare_module! {
-    module_name: "obs-irl-source",
+    module_name: "kastry-irl-source",
     default_locale: "en-US",
     // The oldest supported OBS line (build.yml OBS_VERSION). obs_init_module
     // gates on major.minor only, so one binary loads on every newer release.
     api_version: (32, 1, 2),
-    name: "IRL Source",
-    description: "IRL Source by irlserver.com - live streaming source with jitter buffering, PTS repair, and adaptive latency control",
+    name: "Kastry IRL Source",
+    description: "Kastry IRL Source (kastry.net), a modified version of IRL Source by irlserver.com - live streaming source with jitter buffering, PTS repair, and adaptive latency control",
     author: "Thomas Lekanger",
     load: module_load,
     post_load: module_post_load,
@@ -48,7 +48,7 @@ fn module_load() -> bool {
     spawn_deadlock_poller();
     obs::register_source::<source::IrlSource>();
     providers::init();
-    irl_info!("IRL Source plugin loaded (version {})", PLUGIN_VERSION);
+    irl_info!("Kastry IRL Source plugin loaded (version {})", PLUGIN_VERSION);
     true
 }
 

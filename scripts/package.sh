@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# obs-irl-source — build a release archive from a cargo build artifact.
+# kastry-irl-source — build a release archive from a cargo build artifact.
 #
 # Copyright (C) 2026 Thomas Lekanger
 # SPDX-License-Identifier: AGPL-3.0-or-later
@@ -64,7 +64,7 @@ artifact() {
 # data directory the platform's obs_module_file() resolves to.
 stage_data() {
 	mkdir -p "$1/locale"
-	cp "${repo_root}/data/locale/en-US.ini" "$1/locale/"
+	cp "${repo_root}/data/locale/"*.ini "$1/locale/"
 	cp "${repo_root}/data/providers.json" "$1/"
 	cp "${repo_root}/LICENSE" "${repo_root}/THIRD_PARTY_NOTICES.md" "$1/"
 }
@@ -72,22 +72,22 @@ stage_data() {
 case "${platform}" in
 linux)
 	# Extracts into ~/.config/obs-studio/plugins/
-	archive="${out_dir}/obs-irl-source-${version}-linux-x64.tar.gz"
-	mkdir -p "${staging}/obs-irl-source/bin/64bit"
+	archive="${out_dir}/kastry-irl-source-${version}-linux-x64.tar.gz"
+	mkdir -p "${staging}/kastry-irl-source/bin/64bit"
 	cp "$(artifact libobs_irl_source.so)" \
-		"${staging}/obs-irl-source/bin/64bit/obs-irl-source.so"
-	stage_data "${staging}/obs-irl-source/data"
-	tar -C "${staging}" -czf "${archive}" obs-irl-source
+		"${staging}/kastry-irl-source/bin/64bit/kastry-irl-source.so"
+	stage_data "${staging}/kastry-irl-source/data"
+	tar -C "${staging}" -czf "${archive}" kastry-irl-source
 	;;
 windows)
 	# Extracts into the OBS Studio install folder; the DLL lands in
 	# obs-plugins\64bit. No w32-pthreads.dll: the Rust plugin never calls
 	# pthreads, which is what the C build needed it for.
-	archive="${out_dir}/obs-irl-source-${version}-windows-x64.zip"
+	archive="${out_dir}/kastry-irl-source-${version}-windows-x64.zip"
 	mkdir -p "${staging}/obs-plugins/64bit"
 	cp "$(artifact obs_irl_source.dll)" \
-		"${staging}/obs-plugins/64bit/obs-irl-source.dll"
-	stage_data "${staging}/data/obs-plugins/obs-irl-source"
+		"${staging}/obs-plugins/64bit/kastry-irl-source.dll"
+	stage_data "${staging}/data/obs-plugins/kastry-irl-source"
 	rm -f "${archive}"
 	(cd "${staging}" && zip -qr "${archive}" obs-plugins data)
 	;;
@@ -96,10 +96,10 @@ macos)
 	# OBS on macOS only scans .plugin bundles — its module path is
 	# %module%.plugin/Contents/MacOS with an extensionless binary — so this
 	# must be a bundle, not the Linux-style bin/ directory.
-	archive="${out_dir}/obs-irl-source-${version}-macos-arm64.zip"
-	bundle="${staging}/obs-irl-source.plugin"
+	archive="${out_dir}/kastry-irl-source-${version}-macos-arm64.zip"
+	bundle="${staging}/kastry-irl-source.plugin"
 	mkdir -p "${bundle}/Contents/MacOS"
-	cp "$(artifact libobs_irl_source.dylib)" "${bundle}/Contents/MacOS/obs-irl-source"
+	cp "$(artifact libobs_irl_source.dylib)" "${bundle}/Contents/MacOS/kastry-irl-source"
 	sed "s/@PLUGIN_VERSION@/${version}/g" "${repo_root}/packaging/Info.plist.in" \
 		>"${bundle}/Contents/Info.plist"
 	# obs_module_file() resolves to Contents/Resources inside a bundle.
@@ -110,11 +110,11 @@ macos)
 	# Mac and re-uploads. Notarization additionally needs
 	# NOTARIZE_APPLE_ID / NOTARIZE_PASSWORD / NOTARIZE_TEAM_ID.
 	if [[ $(uname -s) == Darwin ]]; then
-		dsym="${out_dir}/obs-irl-source-${version}-macos-arm64.dSYM.tar.gz"
+		dsym="${out_dir}/kastry-irl-source-${version}-macos-arm64.dSYM.tar.gz"
 		if command -v dsymutil >/dev/null; then
-			dsymutil "${bundle}/Contents/MacOS/obs-irl-source" \
-				-o "${staging}/obs-irl-source.dSYM"
-			tar -C "${staging}" -czf "${dsym}" obs-irl-source.dSYM
+			dsymutil "${bundle}/Contents/MacOS/kastry-irl-source" \
+				-o "${staging}/kastry-irl-source.dSYM"
+			tar -C "${staging}" -czf "${dsym}" kastry-irl-source.dSYM
 		fi
 		if [[ -n ${CODESIGN_IDENTITY:-} ]]; then
 			codesign --force --options runtime --timestamp \
@@ -122,7 +122,7 @@ macos)
 		fi
 	fi
 	rm -f "${archive}"
-	(cd "${staging}" && zip -qr "${archive}" obs-irl-source.plugin)
+	(cd "${staging}" && zip -qr "${archive}" kastry-irl-source.plugin)
 	if [[ $(uname -s) == Darwin && -n ${CODESIGN_IDENTITY:-} && -n ${NOTARIZE_APPLE_ID:-} ]]; then
 		xcrun notarytool submit "${archive}" --wait \
 			--apple-id "${NOTARIZE_APPLE_ID}" \
@@ -134,27 +134,27 @@ deb)
 	# A Debian package installing system-wide, next to distro OBS:
 	# /usr/lib/<multiarch>/obs-plugins + /usr/share/obs/obs-plugins/<id>.
 	command -v dpkg-deb >/dev/null || die "dpkg-deb not found"
-	deb="${out_dir}/obs-irl-source_${version}_amd64.deb"
+	deb="${out_dir}/kastry-irl-source_${version}_amd64.deb"
 	pkgroot="${staging}/pkg"
 	libdir="${pkgroot}/usr/lib/x86_64-linux-gnu/obs-plugins"
-	datadir="${pkgroot}/usr/share/obs/obs-plugins/obs-irl-source"
-	docdir="${pkgroot}/usr/share/doc/obs-irl-source"
+	datadir="${pkgroot}/usr/share/obs/obs-plugins/kastry-irl-source"
+	docdir="${pkgroot}/usr/share/doc/kastry-irl-source"
 	mkdir -p "${libdir}" "${datadir}" "${docdir}" "${pkgroot}/DEBIAN"
-	cp "$(artifact libobs_irl_source.so)" "${libdir}/obs-irl-source.so"
+	cp "$(artifact libobs_irl_source.so)" "${libdir}/kastry-irl-source.so"
 	stage_data "${datadir}"
 	# Debian wants licenses under /usr/share/doc; keep copies with the
 	# plugin data too, matching the tarball layout.
 	cp "${repo_root}/LICENSE" "${docdir}/copyright"
 	cp "${repo_root}/THIRD_PARTY_NOTICES.md" "${docdir}/"
 	cat >"${pkgroot}/DEBIAN/control" <<-EOF
-		Package: obs-irl-source
+		Package: kastry-irl-source
 		Version: ${version}
 		Architecture: amd64
 		Section: video
 		Priority: optional
-		Maintainer: Thomas Lekanger <datagutt@lekanger.no>
+		Maintainer: Kastry <hello@kastry.net>
 		Depends: obs-studio (>= 32.1)
-		Homepage: https://github.com/irlserver/obs-irl-source
+		Homepage: https://github.com/yzii23/kastry-irl-zdroj
 		Description: IRL streaming source plugin for OBS Studio
 		 Receives live IRL streams over SRT, RTMP, RIST or any protocol the
 		 bundled FFmpeg supports, with jitter buffering, PTS repair, adaptive

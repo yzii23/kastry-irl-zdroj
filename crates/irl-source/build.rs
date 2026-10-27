@@ -9,7 +9,7 @@ fn main() {
             // verify-plugin.sh rejects non-system absolute paths in the load
             // commands. An @rpath id is inert for OBS (plugins load by path)
             // and keeps the artifact free of builder paths.
-            println!("cargo::rustc-cdylib-link-arg=-Wl,-install_name,@rpath/obs-irl-source");
+            println!("cargo::rustc-cdylib-link-arg=-Wl,-install_name,@rpath/kastry-irl-source");
             println!("cargo::rustc-link-arg-tests=-Wl,-undefined,dynamic_lookup");
         }
         // rustc already restricts a cdylib's exports to #[no_mangle] items via

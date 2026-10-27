@@ -1,4 +1,4 @@
--- Updates a text source with IRL Source stats.
+-- Updates a text source with Kastry IRL Source stats.
 --
 -- The stats come from the plugin's "get_stats" proc handler, the same entry
 -- point the obs-websocket vendor extension calls, so both report the same
@@ -12,11 +12,11 @@ local last_text = nil
 local irl_source_name = ""
 local text_source_name = "IRL Stats"
 
-local IRL_SOURCE_ID = "irl_source"
+local IRL_SOURCE_ID = "kastry_irl_source"
 
 function script_description()
-    return "Updates a text source with IRL Source stats.\n\n" ..
-        "Leave the source name empty to use the first IRL Source found."
+    return "Updates a text source with Kastry IRL Source stats.\n\n" ..
+        "Leave the source name empty to use the first Kastry IRL Source found."
 end
 
 function script_defaults(settings)

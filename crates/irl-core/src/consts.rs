@@ -2,9 +2,9 @@
 //! test pins every value, so a typo is caught once.
 
 /// The source id registered with OBS; also what the websocket vendor matches.
-pub const SOURCE_ID: &str = "irl_source";
+pub const SOURCE_ID: &str = "kastry_irl_source";
 /// obs-websocket vendor name.
-pub const VENDOR_NAME: &str = "obs-irl-source";
+pub const VENDOR_NAME: &str = "kastry-irl-source";
 /// Version of the vendor request API this plugin serves.
 pub const VENDOR_API_VERSION: i64 = 1;
 
@@ -391,8 +391,8 @@ mod tests {
     #[test]
     fn consts_are_pinned() {
         // ── identity ──
-        assert_eq!(SOURCE_ID, "irl_source");
-        assert_eq!(VENDOR_NAME, "obs-irl-source");
+        assert_eq!(SOURCE_ID, "kastry_irl_source");
+        assert_eq!(VENDOR_NAME, "kastry-irl-source");
         assert_eq!(VENDOR_API_VERSION, 1);
 
         // ── settings defaults ──

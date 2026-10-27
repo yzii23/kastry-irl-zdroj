@@ -15,7 +15,7 @@ use serde::Deserialize;
 
 use crate::api;
 
-pub const CLIENT_NAME: &str = "OBS IRL Source";
+pub const CLIENT_NAME: &str = "Kastry IRL Source";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pkce {
