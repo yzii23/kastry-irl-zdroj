@@ -74,3 +74,15 @@ fn the_scan_finds_the_keys_it_should() {
     assert!(keys(SOURCES[1].1).contains(&"SourceName"));
     assert!(keys(SOURCES[2].1).contains(&"Provider"));
 }
+
+/// Kastry: the Czech file has every key the English one has, so a string
+/// merged in from upstream does not show up in English in a Czech OBS.
+#[test]
+fn the_czech_file_has_every_english_key() {
+    let czech = defined(include_str!("../../../data/locale/cs-CZ.ini"));
+    let missing: Vec<&str> = defined(LOCALE)
+        .into_iter()
+        .filter(|key| !czech.contains(key))
+        .collect();
+    assert!(missing.is_empty(), "keys with no cs-CZ.ini entry: {missing:?}");
+}

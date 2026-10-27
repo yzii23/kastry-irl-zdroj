@@ -194,11 +194,14 @@ impl Handoff {
 
 /// `history.replaceState` drops the code out of the address bar the moment
 /// the page loads, so a screen capture does not carry it.
-const RESPONSE_OK: &str = "<!doctype html><meta charset=utf-8><title>Signed in</title>\
-<script>history.replaceState(null,'','/callback')</script>\
+const RESPONSE_OK: &str = "<!doctype html><html lang=cs><meta charset=utf-8>\
+<title>Přihlášeno</title><script>history.replaceState(null,'','/callback')</script>\
 <body style=\"font:16px system-ui;padding:3rem;text-align:center\">\
-<h1>Signed in</h1><p>You can close this tab and go back to OBS.</p>";
+<h1>Přihlášeno</h1><p>Tuhle záložku můžeš zavřít a vrátit se do OBS.</p>\
+<p lang=en style=\"opacity:.6\">Signed in. You can close this tab and go back to OBS.</p>";
 
-const RESPONSE_BAD: &str = "<!doctype html><meta charset=utf-8><title>Sign-in failed</title>\
+const RESPONSE_BAD: &str = "<!doctype html><html lang=cs><meta charset=utf-8>\
+<title>Přihlášení se nepovedlo</title>\
 <body style=\"font:16px system-ui;padding:3rem;text-align:center\">\
-<h1>Sign-in failed</h1><p>Start the sign-in again from OBS.</p>";
+<h1>Přihlášení se nepovedlo</h1><p>Začni přihlášení znovu v OBS.</p>\
+<p lang=en style=\"opacity:.6\">Sign-in failed. Start the sign-in again from OBS.</p>";
