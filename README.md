@@ -76,7 +76,7 @@ The release binary bundles its own media stack and resolves libobs symbols from 
 ## Usage
 
 1. Add a new source: **Kastry IRL Source**
-2. Kastry is already picked as the provider: sign in and choose your stream from the list. Or leave Provider on **Manual URL** and enter your stream URL (for example `srt://your-server:4000?streamid=play/stream/key`).
+2. Kastry is already picked as the provider: sign in, and your stream fills in by itself (with several to choose from, pick one from the list). Or leave Provider on **Manual URL** and enter your stream URL (for example `srt://your-server:4000?streamid=play/stream/key`).
 3. Leave the rest alone unless you have a reason. The defaults are the tested path.
 
 A source you just added sizes itself to the canvas when its first frame arrives, same result as Edit > Transform > Fit to screen (aspect preserved, nothing cropped). This happens once. A source loaded from a saved scene collection is never touched, and once you move or resize it the plugin leaves it alone.

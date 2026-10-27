@@ -285,6 +285,9 @@ pub fn add_properties(props: &Properties, instance: Option<&IrlSource>) {
                 picker.add(&cstring(&label(ingest)), &cstring(&ingest.id));
             }
             picker.on_modified::<IngestPicked>();
+            if let (Some(settings), Some(view)) = (saved.as_ref(), view.as_ref()) {
+                prefill_only_ingest(slot, &view.ingests, settings);
+            }
         }
         props.add_button::<SignInClicked>(
             &slot.key(PREFIX_SIGN_IN),
@@ -306,6 +309,24 @@ pub fn add_properties(props: &Properties, instance: Option<&IrlSource>) {
         .and_then(|d| d.get_str(KEY_PROVIDER))
         .unwrap_or_default();
     apply_visibility(&props.view(), &selected);
+}
+
+/// Kastry: right after signing in, a provider that lists exactly one ingest
+/// (Kastry lists the streamer's own IRL stream) fills it in by itself. Only
+/// for the selected provider and only into an empty URL with nothing picked
+/// yet: the pick written here is what [`IngestPicked`] finds when the dialog
+/// applies its settings after the sign-in wake-up, and it resolves the URL as
+/// if the user had picked it. From then on it is the user's pick like any other.
+fn prefill_only_ingest(slot: Slot, ingests: &[Ingest], settings: &Data<'_>) {
+    let [only] = ingests else { return };
+    if settings.get_str(KEY_PROVIDER).as_deref() != Some(slot.value())
+        || settings.get_str(KEY_URL).is_some()
+        || settings.get_str(&slot.key(PREFIX_INGEST)).is_some()
+        || settings.get_str(&slot.key(PREFIX_RESOLVED_ID)).is_some()
+    {
+        return;
+    }
+    settings.set_str(&slot.key(PREFIX_INGEST), &cstring(&only.id));
 }
 
 /// `name · detail · live 4.2 Mbps`. Only the pieces the provider sent.
