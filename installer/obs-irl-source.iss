@@ -1,10 +1,10 @@
-; Inno Setup script for the Windows release of obs-irl-source.
+; Inno Setup script for the Windows release of kastry-irl-source.
 ;
 ; Build it with:
 ;   iscc /DPluginVersion=1.3.4 /DPayloadDir=..\dist\windows installer\obs-irl-source.iss
 ;
 ; PayloadDir must hold the same layout as the release zip
-; (obs-plugins\64bit\obs-irl-source.dll), so CI stages the zip contents and
+; (obs-plugins\64bit\kastry-irl-source.dll), so CI stages the zip contents and
 ; points this at them rather than maintaining a second file list.
 ;
 ; Note on the OBS version check below: the plugin bundles its own FFmpeg, so
@@ -20,17 +20,17 @@
   #define PayloadDir "..\dist\windows"
 #endif
 
-#define PluginId "obs-irl-source"
-#define AppName "IRL Source for OBS Studio"
+#define PluginId "kastry-irl-source"
+#define AppName "Kastry IRL Source for OBS Studio"
 
 [Setup]
-AppId={{B6E1F4C2-9D3A-4E77-8C15-2A7F0D9B4E31}
+AppId={{904F8590-4645-4CC5-A818-6099F97825CF}
 AppName={#AppName}
 AppVersion={#PluginVersion}
-AppPublisher=irlserver
-AppPublisherURL=https://github.com/irlserver/obs-irl-source
-AppSupportURL=https://github.com/irlserver/obs-irl-source/issues
-AppUpdatesURL=https://github.com/irlserver/obs-irl-source/releases
+AppPublisher=Kastry
+AppPublisherURL=https://github.com/yzii23/kastry-irl-zdroj
+AppSupportURL=https://github.com/yzii23/kastry-irl-zdroj/issues
+AppUpdatesURL=https://github.com/yzii23/kastry-irl-zdroj/releases
 DefaultDirName={code:GetDefaultObsPath}
 AppendDefaultDirName=no
 DirExistsWarning=no
@@ -61,8 +61,8 @@ LicenseFile=..\LICENSE
 OutputDir=..\dist
 OutputBaseFilename={#PluginId}-{#PluginVersion}-windows-x64-setup
 VersionInfoVersion={#PluginVersion}.0
-VersionInfoCompany=irlserver
-VersionInfoDescription=IRL Source for OBS Studio
+VersionInfoCompany=Kastry
+VersionInfoDescription=Kastry IRL Source for OBS Studio
 VersionInfoProductName={#PluginId}
 VersionInfoProductVersion={#PluginVersion}
 
@@ -74,7 +74,7 @@ SelectDirLabel3=Setup will install the plugin into your OBS Studio folder.
 SelectDirBrowseLabel=To continue, click Next. To install into a different OBS Studio folder (a portable install, for example), click Browse.
 
 [Files]
-Source: "{#PayloadDir}\obs-plugins\64bit\obs-irl-source.dll"; DestDir: "{app}\obs-plugins\64bit"; Flags: ignoreversion
+Source: "{#PayloadDir}\obs-plugins\64bit\kastry-irl-source.dll"; DestDir: "{app}\obs-plugins\64bit"; Flags: ignoreversion
 ; Not optional: obs_module_text() falls back to the lookup key, so without the
 ; locale file the properties dialog renders as bare identifiers.
 Source: "..\data\locale\*"; DestDir: "{app}\data\obs-plugins\{#PluginId}\locale"; Flags: ignoreversion

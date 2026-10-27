@@ -134,6 +134,6 @@ fn the_built_in_constructor_sorts_too() {
 #[test]
 fn the_shipped_file_is_the_stock_list() {
     let catalog = Catalog::parse(include_str!("../../../data/providers.json")).unwrap();
-    assert_eq!(catalog.providers()[0].base_url, "https://irlserver.com");
+    assert_eq!(catalog.providers()[0].base_url, "https://kastry.net");
     assert!(catalog.allow_custom());
 }

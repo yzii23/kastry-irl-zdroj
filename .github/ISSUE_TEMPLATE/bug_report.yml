@@ -15,13 +15,13 @@ body:
       label: Before you file
       description: Please work through these first. They resolve most reports.
       options:
-        - label: I searched [existing issues](https://github.com/irlserver/obs-irl-source/issues?q=is%3Aissue) (including closed ones) and this is not already reported.
+        - label: I searched [existing issues](https://github.com/yzii23/kastry-irl-zdroj/issues?q=is%3Aissue) (including closed ones) and this is not already reported.
           required: true
-        - label: I am on the [latest release](https://github.com/irlserver/obs-irl-source/releases) and the problem still happens there.
+        - label: I am on the [latest release](https://github.com/yzii23/kastry-irl-zdroj/releases) and the problem still happens there.
           required: true
         - label: I restarted OBS after installing or updating the plugin.
           required: true
-        - label: I checked the README's [Stats reference](https://github.com/irlserver/obs-irl-source#stats-reference) and, if this is an audio or latency problem, the [audio pipeline notes](https://github.com/irlserver/obs-irl-source/blob/master/docs/audio-pipeline.md).
+        - label: I checked the README's [Stats reference](https://github.com/yzii23/kastry-irl-zdroj#stats-reference) and, if this is an audio or latency problem, the [audio pipeline notes](https://github.com/yzii23/kastry-irl-zdroj/blob/master/docs/audio-pipeline.md).
           required: false
         - label: I tried the same URL with a fresh IRL Source at default settings (Target Buffer 120ms, Hardware Decode Auto), to rule out my own settings.
           required: false

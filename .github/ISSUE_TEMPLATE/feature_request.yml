@@ -7,7 +7,7 @@ body:
     attributes:
       label: Before you file
       options:
-        - label: I searched [existing issues](https://github.com/irlserver/obs-irl-source/issues?q=is%3Aissue) (including closed ones) and this is not already suggested.
+        - label: I searched [existing issues](https://github.com/yzii23/kastry-irl-zdroj/issues?q=is%3Aissue) (including closed ones) and this is not already suggested.
           required: true
         - label: I checked the README to confirm this is not already possible, including through FFmpeg Options or the obs-websocket vendor requests.
           required: true

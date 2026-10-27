@@ -1,8 +1,10 @@
-# IRL Source
+# Kastry IRL Source
+
+**Kastry IRL Source** is [Kastry](https://kastry.net)'s version of [IRL Source](https://github.com/irlserver/obs-irl-source) by Thomas Lekanger ([irlserver.com](https://irlserver.com)), modified by Kastry since 2026-10-27. It installs next to the original without a clash: its own source type (`kastry_irl_source`), file names and obs-websocket vendor (`kastry-irl-source`). Kastry is the default provider: sign in with your Kastry account and pick your IRL stream, or switch to Manual URL or a custom provider. Like the original it is free software under the AGPL-3.0-or-later, see [License](#license).
 
 An OBS source built for IRL streams. Point it at your SRT or RTMP pull URL and it handles the things that go wrong on a phone in a moving vehicle: bitrate drops, cell tower handoffs, brief disconnects, resolution changes mid-stream.
 
-> **Note:** This is an independent project by [irlserver.com](https://irlserver.com). It is not developed by, affiliated with, or endorsed by the OBS Project.
+> **Note:** Kastry IRL Source is not developed by, affiliated with, or endorsed by the OBS Project or irlserver.com.
 
 ## What it does for your stream
 
@@ -24,7 +26,7 @@ Works with SRT, RTMP, RIST, UDP, TCP, HTTP, or anything else FFmpeg can open, an
 
 OBS ships with a Media Source that can play SRT, RTMP and RIST. It works, but it was written for playing files and general media, not for a live feed coming off a phone on mobile data.
 
-| | Media Source | IRL Source |
+| | Media Source | Kastry IRL Source |
 | --- | --- | --- |
 | Unstable connection | Relies on whatever cushion the protocol itself provides, and holds nothing after it | Adds its own cushion (120ms default) behind the protocol latency |
 | After a stall | Latency climbs and stays there, with no way to catch up | Catches up at up to the Catch-Up Speed until latency is back on target, without skipping audio |
@@ -45,7 +47,7 @@ Download from [Releases](../../releases). There is one archive per platform and 
 
 ### Windows
 
-Run `obs-irl-source-<version>-windows-x64-setup.exe`. It finds your OBS Studio folder from the registry, closes OBS if it is running, and can be removed again from Add or Remove Programs.
+Run `kastry-irl-source-<version>-windows-x64-setup.exe`. It finds your OBS Studio folder from the registry, closes OBS if it is running, and can be removed again from Add or Remove Programs.
 
 Or, from the zip:
 
@@ -56,9 +58,9 @@ Or, from the zip:
 ### macOS (Apple Silicon)
 
 1. Close OBS
-2. Extract the zip into `~/Library/Application Support/obs-studio/plugins/` (it contains `obs-irl-source.plugin`; if an older `obs-irl-source` folder is still there, delete it)
+2. Extract the zip into `~/Library/Application Support/obs-studio/plugins/` (it contains `kastry-irl-source.plugin`)
 3. The binary is unsigned, so clear the quarantine flag once:
-   `xattr -dr com.apple.quarantine "$HOME/Library/Application Support/obs-studio/plugins/obs-irl-source.plugin"`
+   `xattr -dr com.apple.quarantine "$HOME/Library/Application Support/obs-studio/plugins/kastry-irl-source.plugin"`
 4. Start OBS
 
 ### Linux
@@ -69,12 +71,12 @@ The release binary bundles its own media stack and resolves libobs symbols from 
 2. Extract the tarball into `~/.config/obs-studio/plugins/` — for the Flatpak, `~/.var/app/com.obsproject.Studio/config/obs-studio/plugins/` (the same layout, under the sandbox's config)
 3. Start OBS
 
-> **Flatpak:** The tarball works when extracted to the Flatpak config path above. A native Flatpak extension (`com.obsproject.Studio.Plugin.obs-irl-source`) is not yet shipped; if you package one, build against `org.freedesktop.Sdk//25.08` (or newer) and the `com.obsproject.Studio` runtime.
+> **Flatpak:** The tarball works when extracted to the Flatpak config path above. A native Flatpak extension (`com.obsproject.Studio.Plugin.kastry-irl-source`) is not yet shipped; if you package one, build against `org.freedesktop.Sdk//25.08` (or newer) and the `com.obsproject.Studio` runtime.
 
 ## Usage
 
-1. Add a new source: **IRL Source**
-2. Pick a provider and sign in, then choose an ingest from the list. Or leave Provider on **Manual URL** and enter your stream URL (for example `srt://your-server:4000?streamid=play/stream/key`).
+1. Add a new source: **Kastry IRL Source**
+2. Kastry is already picked as the provider: sign in and choose your stream from the list. Or leave Provider on **Manual URL** and enter your stream URL (for example `srt://your-server:4000?streamid=play/stream/key`).
 3. Leave the rest alone unless you have a reason. The defaults are the tested path.
 
 A source you just added sizes itself to the canvas when its first frame arrives, same result as Edit > Transform > Fit to screen (aspect preserved, nothing cropped). This happens once. A source loaded from a saved scene collection is never touched, and once you move or resize it the plugin leaves it alone.
@@ -136,7 +138,7 @@ The full list of readable fields is in [Stats reference](#stats-reference).
 
 The same stats are exposed as an [obs-websocket](https://github.com/obsproject/obs-websocket) vendor extension, so an overlay, a bot or a dashboard on another machine can read them without running a script inside OBS. obs-websocket ships with OBS; turn it on under Tools → WebSocket Server Settings. If it is disabled or missing, the plugin registers nothing and behaves exactly as before.
 
-Vendor name: `obs-irl-source`.
+Vendor name: `kastry-irl-source`.
 
 | Request | Request data | Response |
 | --- | --- | --- |
@@ -150,9 +152,9 @@ With [obs-websocket-js](https://github.com/obs-websocket-community-projects/obs-
 
 ```js
 const { responseData } = await obs.call("CallVendorRequest", {
-    vendorName: "obs-irl-source",
+    vendorName: "kastry-irl-source",
     requestType: "GetStats",
-    requestData: { source_name: "IRL Source" },
+    requestData: { source_name: "Kastry IRL Source" },
 });
 
 console.log(responseData.buffer_fill_ms, responseData.current_speed);
@@ -172,22 +174,26 @@ Unlike OBS's own media source, writing settings does **not** implicitly restart 
 
 ## Why open source?
 
-We run a commercial streaming service (relay infrastructure and more), so yes, we have plenty of closed-source code. But OBS itself is GPL-2.0. It is free software built by its community. Paywalling the thing that keeps your stream from dropping frames, just to upsell a subscription, feels like the wrong move.
+From the original author of IRL Source:
 
-The IRL streaming scene was mostly built in the open. Projects like [Moblin](https://github.com/eerimoq/moblin), [NOALBS](https://github.com/NOALBS/nginx-obs-automatic-low-bitrate-switching), and [BELABOX](https://github.com/BELABOX) all started open and pushed things forward because anyone could use them, learn from them, and build on top. Some competitors went the other way and shipped closed-source OBS plugins as a product feature, locking basic stream reliability behind a monthly fee. That is a bad trade for streamers and for the ecosystem. The plugin layer should be something everyone can use, inspect, and improve. That is why this is AGPL. If someone builds on it, those improvements come back too.
-
-If you find this useful, great. If you want managed infrastructure on top of it, that's what [irlserver.com](https://irlserver.com) is for.
+> We run a commercial streaming service (relay infrastructure and more), so yes, we have plenty of closed-source code. But OBS itself is GPL-2.0. It is free software built by its community. Paywalling the thing that keeps your stream from dropping frames, just to upsell a subscription, feels like the wrong move.
+>
+> The IRL streaming scene was mostly built in the open. Projects like [Moblin](https://github.com/eerimoq/moblin), [NOALBS](https://github.com/NOALBS/nginx-obs-automatic-low-bitrate-switching), and [BELABOX](https://github.com/BELABOX) all started open and pushed things forward because anyone could use them, learn from them, and build on top. Some competitors went the other way and shipped closed-source OBS plugins as a product feature, locking basic stream reliability behind a monthly fee. That is a bad trade for streamers and for the ecosystem. The plugin layer should be something everyone can use, inspect, and improve. That is why this is AGPL. If someone builds on it, those improvements come back too.
+>
+> If you find this useful, great. If you want managed infrastructure on top of it, that's what [irlserver.com](https://irlserver.com) is for.
 
 ## AI usage
 
-I (datagutt) don't really know too much C, and I am a bit unfamiliar with the OBS Studio code base.
-What i do have is quite a bit of experience working with video and SRT(LA) protocols from other projects.
+From the original author of IRL Source:
 
-The initial version of this plugin was heavily built with LLM assistance. That includes most of this README (except this "AI Usage" section).
-
-Rest assured I will go through both the README and codebase and clean this up, once I have the initial builds working well.
-
-Any tagged release should at least be fully tested, single commits might not (though i will try to use branches).
+> I (datagutt) don't really know too much C, and I am a bit unfamiliar with the OBS Studio code base.
+> What i do have is quite a bit of experience working with video and SRT(LA) protocols from other projects.
+>
+> The initial version of this plugin was heavily built with LLM assistance. That includes most of this README (except this "AI Usage" section).
+>
+> Rest assured I will go through both the README and codebase and clean this up, once I have the initial builds working well.
+>
+> Any tagged release should at least be fully tested, single commits might not (though i will try to use branches).
 
 ## Contributing
 
@@ -196,11 +202,17 @@ Please don't just copy and paste replies directly from the AI.
 
 ## License
 
-AGPL-3.0-or-later. Copyright (C) 2026 Thomas Lekanger.
+AGPL-3.0-or-later. Copyright (C) 2026 Thomas Lekanger. Kastry's changes: Copyright (C) 2026 Kastry, under the same license.
+
+This is a modified version of [IRL Source](https://github.com/irlserver/obs-irl-source), changed by Kastry since 2026-10-27. What changed is in the git history of this repository; the original's history is kept in it.
+
+The source code of every release is in this repository under the release's tag, and as `kastry-irl-source-<version>-source.tar.gz` next to the binaries.
+
+Under section 7(e) of the license, the license grants no rights to the Kastry name and logo: a modified version may not be called Kastry or present itself as one.
 
 The released binaries statically link FFmpeg (LGPL-3.0), libsrt (MPL-2.0), librist (BSD-2-Clause) and Mbed TLS (Apache-2.0); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), which also ships inside every release archive.
 
-See [irlserver.com](https://irlserver.com) for more information.
+Kastry: [kastry.net](https://kastry.net). The original plugin: [irlserver/obs-irl-source](https://github.com/irlserver/obs-irl-source).
 
 ---
 

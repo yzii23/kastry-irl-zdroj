@@ -17,11 +17,11 @@ Upgrading from 1.x by hand: the payload no longer contains `w32-pthreads.dll`, s
 ### macOS (Apple Silicon)
 
 1. Close OBS.
-2. Extract the zip into `~/Library/Application Support/obs-studio/plugins/`. It contains an `obs-irl-source.plugin` bundle; if an `obs-irl-source` folder from an older release is still there, delete it (that flat layout is invisible to OBS on macOS).
+2. Extract the zip into `~/Library/Application Support/obs-studio/plugins/`. It contains a `kastry-irl-source.plugin` bundle; if a `kastry-irl-source` folder from an older release is still there, delete it (that flat layout is invisible to OBS on macOS).
 3. The binary is not signed or notarized, so clear the quarantine flag once:
 
    ```
-   xattr -dr com.apple.quarantine "$HOME/Library/Application Support/obs-studio/plugins/obs-irl-source.plugin"
+   xattr -dr com.apple.quarantine "$HOME/Library/Application Support/obs-studio/plugins/kastry-irl-source.plugin"
    ```
 
 4. Start OBS.
