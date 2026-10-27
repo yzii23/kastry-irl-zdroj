@@ -48,7 +48,10 @@ fn module_load() -> bool {
     spawn_deadlock_poller();
     obs::register_source::<source::IrlSource>();
     providers::init();
-    irl_info!("Kastry IRL Source plugin loaded (version {})", PLUGIN_VERSION);
+    irl_info!(
+        "Kastry IRL Source plugin loaded (version {})",
+        PLUGIN_VERSION
+    );
     true
 }
 
