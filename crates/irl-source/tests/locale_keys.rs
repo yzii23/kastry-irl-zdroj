@@ -84,5 +84,8 @@ fn the_czech_file_has_every_english_key() {
         .into_iter()
         .filter(|key| !czech.contains(key))
         .collect();
-    assert!(missing.is_empty(), "keys with no cs-CZ.ini entry: {missing:?}");
+    assert!(
+        missing.is_empty(),
+        "keys with no cs-CZ.ini entry: {missing:?}"
+    );
 }

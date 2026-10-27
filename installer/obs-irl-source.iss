@@ -202,6 +202,7 @@ end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
   DetectedVersion: String;
+  MinVersion: String;
 begin
   Result := True;
   if CurPageID <> wpSelectDir then
@@ -216,8 +217,8 @@ begin
 
   if not ObsVersionIsSupported(WizardDirValue, DetectedVersion) then
   begin
-    Result := MsgBox(FmtMessage(CustomMessage('ObsTooOld'),
-                     [IntToStr(MinObsMajor) + '.' + IntToStr(MinObsMinor), DetectedVersion]),
+    MinVersion := IntToStr(MinObsMajor) + '.' + IntToStr(MinObsMinor);
+    Result := MsgBox(FmtMessage(CustomMessage('ObsTooOld'), [MinVersion, DetectedVersion]),
                      mbConfirmation, MB_YESNO) = IDYES;
     if not Result then
       Exit;
