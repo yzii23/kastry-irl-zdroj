@@ -1,0 +1,53 @@
+/* Kastry: the page the browser shows after signing in looks like kastry.net's
+   sign-in pages (public/css/kastry.css, body.auth-page and .box). Fonts and
+   the logo come from the web; without them the page still reads fine. */
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght,ROND@700,100&family=Space+Grotesk:wght@400;500&display=swap');
+body {
+    margin: 0;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+        radial-gradient(ellipse 60% 50% at 80% 0%, rgba(217, 138, 56, 0.10), transparent 70%),
+        radial-gradient(circle, #2b2531 1.25px, transparent 1.7px) 0 0 / 20px 20px,
+        #111013;
+    color: #EEE9E3;
+    font: 15px/1.55 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+main {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    box-sizing: border-box;
+    padding: 34px;
+    border-radius: 24px;
+    background: #1A171E;
+    border: 1px solid rgba(238, 233, 227, 0.09);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #D98A38, transparent);
+    opacity: 0.5;
+}
+img { display: block; height: 18px; width: auto; margin-bottom: 26px; }
+h1 {
+    margin: 0 0 14px;
+    font-family: 'Doto', 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-variation-settings: "ROND" 100;
+    text-transform: uppercase;
+    font-size: 30px;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+}
+p { margin: 0; color: #C9C1CF; }
+.en { margin-top: 18px; font-size: 13.5px; color: #A39AAB; }

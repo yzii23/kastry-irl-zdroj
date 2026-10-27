@@ -176,8 +176,8 @@ impl Handoff {
         let outcome = classify(&parse_query(line), &self.state);
 
         let body = match outcome {
-            Some(Outcome::Code(_)) => RESPONSE_OK,
-            _ => RESPONSE_BAD,
+            Some(Outcome::Code(_)) => response_ok(),
+            _ => response_bad(),
         };
         let _ = stream.write_all(
             format!(
@@ -192,16 +192,38 @@ impl Handoff {
     }
 }
 
+/// Kastry: both pages look like kastry.net's sign-in pages and say it in
+/// Czech first, English below.
+const PAGE_CSS: &str = include_str!("kastry-page.css");
+
+fn page(title: &str, head: &str, text: &str, en: &str) -> String {
+    format!(
+        "<!doctype html><html lang=cs><meta charset=utf-8>\
+         <meta name=viewport content=\"width=device-width,initial-scale=1\">\
+         <title>{title} | Kastry</title>\
+         <link rel=icon href=\"https://kastry.net/public/img/favicon.ico\">{head}\
+         <style>{PAGE_CSS}</style><body><main>\
+         <img src=\"https://kastry.net/public/img/logo.svg\" alt=Kastry>\
+         <h1>{title}</h1><p>{text}</p><p class=en lang=en>{en}</p></main>"
+    )
+}
+
 /// `history.replaceState` drops the code out of the address bar the moment
 /// the page loads, so a screen capture does not carry it.
-const RESPONSE_OK: &str = "<!doctype html><html lang=cs><meta charset=utf-8>\
-<title>Přihlášeno</title><script>history.replaceState(null,'','/callback')</script>\
-<body style=\"font:16px system-ui;padding:3rem;text-align:center\">\
-<h1>Přihlášeno</h1><p>Tuhle záložku můžeš zavřít a vrátit se do OBS.</p>\
-<p lang=en style=\"opacity:.6\">Signed in. You can close this tab and go back to OBS.</p>";
+fn response_ok() -> String {
+    page(
+        "Přihlášeno",
+        "<script>history.replaceState(null,'','/callback')</script>",
+        "Tuhle záložku můžeš zavřít a vrátit se do OBS.",
+        "Signed in. You can close this tab and go back to OBS.",
+    )
+}
 
-const RESPONSE_BAD: &str = "<!doctype html><html lang=cs><meta charset=utf-8>\
-<title>Přihlášení se nepovedlo</title>\
-<body style=\"font:16px system-ui;padding:3rem;text-align:center\">\
-<h1>Přihlášení se nepovedlo</h1><p>Začni přihlášení znovu v OBS.</p>\
-<p lang=en style=\"opacity:.6\">Sign-in failed. Start the sign-in again from OBS.</p>";
+fn response_bad() -> String {
+    page(
+        "Přihlášení se nepovedlo",
+        "",
+        "Začni přihlášení znovu v OBS.",
+        "Sign-in failed. Start the sign-in again from OBS.",
+    )
+}
