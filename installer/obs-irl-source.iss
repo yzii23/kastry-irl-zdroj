@@ -1,4 +1,4 @@
-; Inno Setup script for the Windows release of kastry-irl-source.
+﻿; Inno Setup script for the Windows release of kastry-irl-source.
 ;
 ; Build it with:
 ;   iscc /DPluginVersion=1.3.4 /DPayloadDir=..\dist\windows installer\obs-irl-source.iss
@@ -51,6 +51,7 @@ ArchitecturesInstallIn64BitMode=x64
 #endif
 MinVersion=10.0.17763
 WizardStyle=modern
+ShowLanguageDialog=auto
 Compression=lzma2/ultra64
 SolidCompression=yes
 SetupLogging=yes
@@ -66,12 +67,28 @@ VersionInfoDescription=Kastry IRL Source for OBS Studio
 VersionInfoProductName={#PluginId}
 VersionInfoProductVersion={#PluginVersion}
 
+; Czech for a Czech Windows, English otherwise (ShowLanguageDialog=auto asks
+; only when neither matches). The file is UTF-8 with a BOM, which is how the
+; compiler knows the Czech texts are UTF-8.
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "czech"; MessagesFile: "compiler:Languages\Czech.isl"
 
 [Messages]
-SelectDirLabel3=Setup will install the plugin into your OBS Studio folder.
-SelectDirBrowseLabel=To continue, click Next. To install into a different OBS Studio folder (a portable install, for example), click Browse.
+english.SelectDirLabel3=Setup will install the plugin into your OBS Studio folder.
+english.SelectDirBrowseLabel=To continue, click Next. To install into a different OBS Studio folder (a portable install, for example), click Browse.
+czech.SelectDirLabel3=Instalátor nainstaluje plugin do složky OBS Studia.
+czech.SelectDirBrowseLabel=Pokračuj tlačítkem Další. Pro instalaci do jiné složky OBS Studia (třeba přenosné verze) klikni na Procházet.
+
+[CustomMessages]
+english.LaunchObs=Launch OBS Studio
+czech.LaunchObs=Spustit OBS Studio
+english.UserCopy=Another copy of this plugin is installed for your user account at:%n%n%1%n%nOBS loads both and the second one fails to register. Delete that folder after Setup finishes.
+czech.UserCopy=Pro tvůj uživatelský účet je nainstalovaná ještě jedna kopie tohoto pluginu:%n%n%1%n%nOBS načte obě a druhá se nezaregistruje. Po dokončení instalace tu složku smaž.
+english.NotObsFolder=Please select the OBS Studio root folder.%n%n%1 was not found in the selected directory.
+czech.NotObsFolder=Vyber hlavní složku OBS Studia.%n%nVe vybrané složce není %1.
+english.ObsTooOld=This plugin needs OBS Studio %1 or newer.%n%nDetected version: %2%n%nIt will not load on this version. Install anyway?
+czech.ObsTooOld=Tenhle plugin potřebuje OBS Studio %1 nebo novější.%n%nNalezená verze: %2%n%nV téhle verzi se nenačte. Přesto nainstalovat?
 
 [Files]
 Source: "{#PayloadDir}\obs-plugins\64bit\kastry-irl-source.dll"; DestDir: "{app}\obs-plugins\64bit"; Flags: ignoreversion
@@ -94,7 +111,7 @@ Type: files; Name: "{app}\obs-plugins\64bit\w32-pthreads.dll"
 
 [Run]
 ; runasoriginaluser keeps OBS out of the elevated token the installer runs under.
-Filename: "{app}\bin\64bit\obs64.exe"; WorkingDir: "{app}\bin\64bit"; Description: "Launch OBS Studio"; Flags: nowait postinstall skipifsilent runasoriginaluser
+Filename: "{app}\bin\64bit\obs64.exe"; WorkingDir: "{app}\bin\64bit"; Description: "{cm:LaunchObs}"; Flags: nowait postinstall skipifsilent runasoriginaluser
 
 [Code]
 const
@@ -179,10 +196,7 @@ var
 begin
   UserCopy := ExpandConstant('{userappdata}\obs-studio\plugins\{#PluginId}');
   if DirExists(UserCopy) then
-    MsgBox('Another copy of this plugin is installed for your user account at:' + #13#10#13#10 +
-           UserCopy + #13#10#13#10 +
-           'OBS loads both and the second one fails to register. Delete that folder after Setup finishes.',
-           mbInformation, MB_OK);
+    MsgBox(FmtMessage(CustomMessage('UserCopy'), [UserCopy]), mbInformation, MB_OK);
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
@@ -195,20 +209,15 @@ begin
 
   if not IsValidObsPath(WizardDirValue) then
   begin
-    MsgBox('Please select the OBS Studio root folder.' + #13#10#13#10 +
-           ObsExecutable + ' was not found in the selected directory.',
-           mbError, MB_OK);
+    MsgBox(FmtMessage(CustomMessage('NotObsFolder'), [ObsExecutable]), mbError, MB_OK);
     Result := False;
     Exit;
   end;
 
   if not ObsVersionIsSupported(WizardDirValue, DetectedVersion) then
   begin
-    Result := MsgBox('This plugin needs OBS Studio ' +
-                     IntToStr(MinObsMajor) + '.' + IntToStr(MinObsMinor) +
-                     ' or newer.' + #13#10#13#10 +
-                     'Detected version: ' + DetectedVersion + #13#10#13#10 +
-                     'It will not load on this version. Install anyway?',
+    Result := MsgBox(FmtMessage(CustomMessage('ObsTooOld'),
+                     [IntToStr(MinObsMajor) + '.' + IntToStr(MinObsMinor), DetectedVersion]),
                      mbConfirmation, MB_YESNO) = IDYES;
     if not Result then
       Exit;
