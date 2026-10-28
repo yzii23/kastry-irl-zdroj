@@ -60,6 +60,7 @@ fn module_post_load() {
 }
 
 fn module_unload() {
+    providers::shutdown();
     ffmpeg::srt::release();
 }
 

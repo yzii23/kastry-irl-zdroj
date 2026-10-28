@@ -30,12 +30,19 @@
 //! from the `providers.json` shipped in the plugin's data directory
 //! ([`load_catalog`]). The repo's `data/providers.json` is the stock list.
 
+use std::collections::HashMap;
 use std::ffi::{CStr, CString};
 use std::sync::OnceLock;
+use std::sync::mpsc::{self, RecvTimeoutError};
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
 
 use irl_core::consts::SOURCE_ID;
-use irl_provider::{Catalog, Hooks, Ingest, Level};
-use obs::{ClickAction, Data, ModifiedAction, Properties, PropertiesRef, TextType};
+use irl_provider::{Catalog, Hooks, Ingest, Level, ResolveError};
+use obs::{
+    CallData, ClickAction, Data, ModifiedAction, OwnedData, Properties, PropertiesRef,
+    SourceHandle, TextType,
+};
 use parking_lot::Mutex;
 
 use crate::module_text;
@@ -121,6 +128,17 @@ pub fn init() {
         log,
         wake_dialogs,
     });
+    start_url_watch();
+}
+
+/// Stop the [`start_url_watch`] thread. Module unload, before libobs frees
+/// the sources the thread may be holding.
+pub fn shutdown() {
+    let watch = URL_WATCH.lock().take();
+    if let Some((stop, thread)) = watch {
+        drop(stop);
+        let _ = thread.join();
+    }
 }
 
 fn log(level: Level, msg: &str) {
@@ -147,6 +165,120 @@ fn wake_dialogs() {
     for source in &sources {
         source.handle().update_properties();
     }
+}
+
+/// How often the watch looks for sources that are reconnecting.
+const WATCH_EVERY: Duration = Duration::from_secs(5);
+/// How long after asking about a source the watch may ask about it again.
+const RECHECK_AFTER: Duration = Duration::from_secs(120);
+
+/// Dropping the sender wakes the thread and ends it.
+static URL_WATCH: Mutex<Option<(mpsc::Sender<()>, JoinHandle<()>)>> = Mutex::new(None);
+
+/// Kastry: a key rotated on the provider's side (Kastry's "New OBS key")
+/// leaves `url` holding a key the server now refuses, and the receiver would
+/// retry it forever. While a source keeps reconnecting, this resolves its pick
+/// again, at most every [`RECHECK_AFTER`], and writes a changed URL the way a
+/// pick does. A source that streams is never touched, and a failed request
+/// leaves `url` alone: streaming still never waits on a provider.
+fn start_url_watch() {
+    let (stop, stopped) = mpsc::channel::<()>();
+    let spawned = std::thread::Builder::new()
+        .name("irl-provider-watch".into())
+        .spawn(move || {
+            let mut asked: HashMap<String, Instant> = HashMap::new();
+            while let Err(RecvTimeoutError::Timeout) = stopped.recv_timeout(WATCH_EVERY) {
+                recheck_reconnecting(&mut asked);
+            }
+        });
+    match spawned {
+        Ok(thread) => *URL_WATCH.lock() = Some((stop, thread)),
+        Err(e) => irl_warn!("Could not start the provider URL watch: {e}"),
+    }
+}
+
+/// One pass of the watch. `asked` remembers, by source name, when each source
+/// was last asked about.
+fn recheck_reconnecting(asked: &mut HashMap<String, Instant>) {
+    let mut sources = Vec::new();
+    obs::source::enum_sources(&mut |source| {
+        if source.unversioned_id() == SOURCE_ID
+            && let Some(owned) = source.get_ref()
+        {
+            sources.push(owned);
+        }
+        true
+    });
+    let now = Instant::now();
+    asked.retain(|_, at| now.duration_since(*at) < RECHECK_AFTER);
+    for source in &sources {
+        let source = source.handle();
+        if !reconnecting(source) {
+            continue;
+        }
+        let name = source.name();
+        if asked.contains_key(&name) {
+            continue;
+        }
+        asked.insert(name, now);
+        refresh_picked_url(source);
+    }
+}
+
+/// The `reconnecting` stat, through the same proc obs-websocket's GetStats
+/// calls.
+fn reconnecting(source: SourceHandle) -> bool {
+    let mut cd = CallData::new();
+    source.proc_handler().call(c"get_stats", &mut cd)
+        && cd.get_bool(c"reconnecting").unwrap_or(false)
+}
+
+/// Resolve the source's pick again and write the URL if it changed. Only for
+/// a `url` that is still what the pick resolved to: one edited by hand since
+/// is the user's.
+fn refresh_picked_url(source: SourceHandle) {
+    let owned = source.settings();
+    let settings = owned.data();
+    let Some(selected) = settings.get_str(KEY_PROVIDER) else {
+        return;
+    };
+    let Some(slot) = Slot::all().find(|slot| slot.value() == selected) else {
+        return;
+    };
+    let (Some(id), Some(resolved), Some(url)) = (
+        settings.get_str(&slot.key(PREFIX_RESOLVED_ID)),
+        settings.get_str(&slot.key(PREFIX_RESOLVED_URL)),
+        settings.get_str(KEY_URL),
+    ) else {
+        return;
+    };
+    if resolved != url {
+        return;
+    }
+    let Some(base_url) = slot.base_url(Some(&settings)) else {
+        return;
+    };
+    let fresh = match irl_provider::resolve(&base_url, &id) {
+        Ok(fresh) => fresh,
+        Err(ResolveError::NotSignedIn) => return,
+        Err(e) => {
+            irl_info!("Could not ask the provider for a new URL: {e}");
+            return;
+        }
+    };
+    if fresh == url {
+        return;
+    }
+    let Ok(fresh) = CString::new(fresh) else {
+        irl_warn!("The provider returned a URL with a NUL in it");
+        return;
+    };
+    crate::log::log_input_url("The provider has a new URL for this stream", &fresh);
+    let changes = OwnedData::new();
+    let data = changes.data();
+    data.set_str(KEY_URL, &fresh);
+    data.set_str(&slot.key(PREFIX_RESOLVED_URL), &fresh);
+    source.update(&data);
 }
 
 pub fn defaults(settings: &Data<'_>) {

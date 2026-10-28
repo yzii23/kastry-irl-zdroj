@@ -604,6 +604,9 @@ unsafe extern "C" {
     /// properties dialog for it. Only signals, so safe from a worker thread —
     /// the Qt side hops to the UI thread through a queued connection.
     pub fn obs_source_update_properties(source: *mut obs_source_t);
+    /// Merges `settings` into the source's settings and applies them, as the
+    /// properties dialog and obs-websocket's SetInputSettings do.
+    pub fn obs_source_update(source: *mut obs_source_t, settings: *mut obs_data_t);
 
     // ── obs.h: scenes and scene items ──────────────────────────────────
     pub fn obs_scene_from_source(source: *const obs_source_t) -> *mut obs_scene_t;
