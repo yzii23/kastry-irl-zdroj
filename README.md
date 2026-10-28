@@ -47,7 +47,7 @@ Download from [Releases](../../releases). There is one archive per platform and 
 
 ### Windows
 
-Run `kastry-irl-source-<version>-windows-x64-setup.exe`. It finds your OBS Studio folder from the registry, closes OBS if it is running, and can be removed again from Add or Remove Programs.
+Run `kastry-irl-source-windows-x64-setup.exe`. It finds your OBS Studio folder from the registry, closes OBS if it is running, and can be removed again from Add or Remove Programs.
 
 Or, from the zip:
 

@@ -1,10 +1,16 @@
+## Instalace (česky)
+
+Pro Windows stáhni `kastry-irl-source-windows-x64-setup.exe` a spusť ho. Potřebuješ OBS 32.1 nebo novější. Instalátor není podepsaný, takže se Windows napoprvé zeptá: klikni na **Další informace** a **Přesto spustit**.
+
+V OBS pak přidej zdroj **Kastry IRL zdroj**, klikni na **Přihlásit** a na kastry.net povol přístup. Stream se doplní sám.
+
 ## Installation
 
 One download per platform (Windows also gets an installer), and it works on OBS 32.1 and newer. The plugin bundles its own FFmpeg and libsrt, so there is no longer a separate download per OBS version.
 
 ### Windows
 
-Run `-windows-x64-setup.exe`. It locates OBS Studio from the registry, closes it if it is running, and registers an entry in Add or Remove Programs. The installer is unsigned, so SmartScreen asks for a confirmation the first time.
+Run `kastry-irl-source-windows-x64-setup.exe`. It locates OBS Studio from the registry, closes it if it is running, and registers an entry in Add or Remove Programs. The installer is unsigned, so SmartScreen asks for a confirmation the first time.
 
 Prefer to do it by hand? Use the zip instead:
 

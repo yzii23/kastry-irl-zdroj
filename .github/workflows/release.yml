@@ -1,8 +1,10 @@
 name: Release
 
+# Kastry releases are tagged kastry-vX.Y.Z: the plain vX.Y.Z tags came with the
+# fork and belong to the upstream releases.
 on:
   push:
-    tags: ["v*"]
+    tags: ["kastry-v*"]
 
 permissions:
   contents: write
@@ -15,7 +17,7 @@ jobs:
 
       - name: Verify tag matches the workspace version
         run: |
-          tag_version="${GITHUB_REF_NAME#v}"
+          tag_version="${GITHUB_REF_NAME#kastry-v}"
           cargo_version="$(sed -nE '/^\[workspace\.package\]/,/^\[[^w]/ s/^version[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' Cargo.toml | head -n1)"
           echo "tag: ${tag_version}  Cargo.toml: ${cargo_version}"
           if [ "${tag_version}" != "${cargo_version}" ]; then
@@ -52,7 +54,7 @@ jobs:
       - name: Package
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          version="${GITHUB_REF_NAME#kastry-v}"
 
           chmod +x scripts/package.sh
           scripts/package.sh linux  artifacts/kastry-irl-source-linux-x64   dist "${version}"
@@ -69,8 +71,10 @@ jobs:
 
           # Windows installer, built by the Windows job in build.yml. Same
           # payload as the zip above, for people who would rather not hand-copy
-          # DLLs into Program Files.
-          cp artifacts/kastry-irl-source-windows-installer/*.exe dist/
+          # DLLs into Program Files. Saved without the version, so
+          # releases/latest/download/kastry-irl-source-windows-x64-setup.exe
+          # (the link on kastry.net) always gets the newest one.
+          cp artifacts/kastry-irl-source-windows-installer/*.exe dist/kastry-irl-source-windows-x64-setup.exe
 
           (cd dist && sha256sum ./* > sha256sums.txt)
           ls -l dist
@@ -84,7 +88,11 @@ jobs:
             cat .github/release-notes-header.md
             echo "## What's changed"
             echo
-            scripts/changelog.sh "${GITHUB_REF_NAME}"
+            # Since the previous Kastry release, or since the upstream release
+            # the fork started from.
+            prev="$(git describe --tags --abbrev=0 --match 'kastry-v[0-9]*' "${GITHUB_REF_NAME}^" 2>/dev/null \
+              || git describe --tags --abbrev=0 --match 'v[0-9]*' "${GITHUB_REF_NAME}^")"
+            scripts/changelog.sh "${GITHUB_REF_NAME}" "${prev}"
           } > notes.md
           cat notes.md
 
@@ -93,8 +101,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          version="${GITHUB_REF_NAME#kastry-v}"
           gh release create "${GITHUB_REF_NAME}" dist/* \
             --draft \
-            --title "kastry-irl-source ${version}" \
+            --title "Kastry IRL Source ${version}" \
             --notes-file notes.md
