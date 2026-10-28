@@ -125,6 +125,8 @@ Authorization: Bearer {access_token}
 The plugin writes `url` into its URL setting and forgets it. The server may mint, rotate, or scope the key inside the URL however it likes; nothing in the plugin depends on the URL's shape beyond FFmpeg being able to open it.
 
 - 404: the id is unknown or the user no longer has access to it. The plugin leaves the URL setting alone and refreshes the list.
+
+Kastry IRL Source also asks again on its own: while a source whose URL came from a pick keeps reconnecting, it resolves that pick at most every 2 minutes and, when the URL changed (a rotated key), writes the new one the way a pick does. A source that streams is never touched, and a failed request leaves `url` as it is.
 - 403: the user may see this ingest but not pull it. Same handling as 404, with `error_description` in the OBS log.
 
 ## Timeouts and identification

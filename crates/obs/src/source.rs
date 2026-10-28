@@ -343,6 +343,14 @@ impl SourceHandle {
         unsafe { obs_sys::obs_source_update_properties(self.as_ptr()) };
     }
 
+    /// `obs_source_update`: merge `changes` into the source's settings and
+    /// apply them, the way the properties dialog's OK and obs-websocket's
+    /// SetInputSettings do. libobs takes its own copy of what it merges.
+    pub fn update(&self, changes: &Data<'_>) {
+        // SAFETY: live handle and live settings for the duration of the call.
+        unsafe { obs_sys::obs_source_update(self.as_ptr(), changes.as_ptr()) };
+    }
+
     /// `obs_source_get_unversioned_id`.
     pub fn unversioned_id(&self) -> String {
         // SAFETY: live handle; the id is a static string in the source info.
