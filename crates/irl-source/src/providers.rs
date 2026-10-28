@@ -275,9 +275,10 @@ fn refresh_picked_url(source: SourceHandle) {
     };
     crate::log::log_input_url("The provider has a new URL for this stream", &fresh);
     let changes = OwnedData::new();
-    changes.data().set_str(KEY_URL, &fresh);
-    changes.data().set_str(&slot.key(PREFIX_RESOLVED_URL), &fresh);
-    source.update(&changes.data());
+    let data = changes.data();
+    data.set_str(KEY_URL, &fresh);
+    data.set_str(&slot.key(PREFIX_RESOLVED_URL), &fresh);
+    source.update(&data);
 }
 
 pub fn defaults(settings: &Data<'_>) {
